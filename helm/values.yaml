@@ -5,7 +5,7 @@ namespace: opencut
 web:
   replicaCount: 2
   image:
-    repository: opencut/web
+    repository: ghcr.io/lore09/opencut
     tag: latest
     pullPolicy: IfNotPresent
   service:
