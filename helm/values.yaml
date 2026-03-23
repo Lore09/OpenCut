@@ -3,7 +3,7 @@ namespace: opencut
 
 # -- Web application
 web:
-  replicaCount: 2
+  replicaCount: 1
   image:
     repository: ghcr.io/lore09/opencut
     tag: latest
@@ -21,7 +21,7 @@ web:
       memory: 1Gi
   env:
     NODE_ENV: production
-    NEXT_PUBLIC_SITE_URL: "https://opencut.local"
+    NEXT_PUBLIC_SITE_URL: "https://opencut.k3s.chungo.home"
     NEXT_PUBLIC_MARBLE_API_URL: "https://api.marblecms.com"
   secrets:
     BETTER_AUTH_SECRET: "your-production-secret-key-here"
@@ -38,15 +38,13 @@ web:
 ingress:
   enabled: true
   className: traefik
-  host: opencut.local
+  host: opencut.k3s.chungo.home
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.middlewares: opencut-headers@kubernetescrd
-  tls: []
-  #  - secretName: opencut-tls
-  #    hosts:
-  #      - opencut.local
+    cert-manager.io/cluster-issuer: chungo-home-issuer
+  tls:
+  - secretName: opencut-tls
+    hosts:
+      - opencut.k3s.chungo.home
 
 # -- PostgreSQL
 postgres:
