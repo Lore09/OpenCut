@@ -1,0 +1,17 @@
+{{- if .Values.serverlessRedisHttp.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opencut.fullname" . }}-serverless-redis-http
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: serverless-redis-http
+    {{- include "opencut.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: serverless-redis-http
+{{- end }}

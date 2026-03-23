@@ -1,0 +1,17 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opencut.fullname" . }}-postgres
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: postgres
+    {{- include "opencut.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres
+{{- end }}

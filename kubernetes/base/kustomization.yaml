@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: opencut
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - postgres/statefulset.yaml
+  - postgres/service.yaml
+  - redis/deployment.yaml
+  - redis/service.yaml
+  - serverless-redis-http/deployment.yaml
+  - serverless-redis-http/service.yaml
+  - web/deployment.yaml
+  - web/service.yaml
+  - web/ingress.yaml

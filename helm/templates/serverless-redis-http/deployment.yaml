@@ -1,0 +1,59 @@
+{{- if .Values.serverlessRedisHttp.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "opencut.fullname" . }}-serverless-redis-http
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: serverless-redis-http
+    {{- include "opencut.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serverless-redis-http
+  template:
+    metadata:
+      labels:
+        app: serverless-redis-http
+    spec:
+      containers:
+        - name: serverless-redis-http
+          image: "{{ .Values.serverlessRedisHttp.image.repository }}:{{ .Values.serverlessRedisHttp.image.tag }}"
+          ports:
+            - containerPort: 80
+          env:
+            - name: SRH_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "opencut.fullname" . }}-config
+                  key: SRH_MODE
+            - name: SRH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "opencut.fullname" . }}-secrets
+                  key: SRH_TOKEN
+            - name: SRH_CONNECTION_STRING
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "opencut.fullname" . }}-config
+                  key: SRH_CONNECTION_STRING
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          resources:
+            {{- toYaml .Values.serverlessRedisHttp.resources | nindent 12 }}
+{{- end }}

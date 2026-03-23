@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: serverless-redis-http
+  namespace: opencut
+  labels:
+    app: serverless-redis-http
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: serverless-redis-http

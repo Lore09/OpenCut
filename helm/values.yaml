@@ -1,0 +1,111 @@
+# -- Global settings
+namespace: opencut
+
+# -- Web application
+web:
+  replicaCount: 2
+  image:
+    repository: opencut/web
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 3000
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  env:
+    NODE_ENV: production
+    NEXT_PUBLIC_SITE_URL: "https://opencut.local"
+    NEXT_PUBLIC_MARBLE_API_URL: "https://api.marblecms.com"
+  secrets:
+    BETTER_AUTH_SECRET: "your-production-secret-key-here"
+    MARBLE_WORKSPACE_KEY: "placeholder"
+    FREESOUND_CLIENT_ID: ""
+    FREESOUND_API_KEY: ""
+    CLOUDFLARE_ACCOUNT_ID: "placeholder"
+    R2_ACCESS_KEY_ID: "placeholder"
+    R2_SECRET_ACCESS_KEY: "placeholder"
+    R2_BUCKET_NAME: "opencut-transcription"
+    MODAL_TRANSCRIPTION_URL: "http://localhost:0"
+
+# -- Ingress
+ingress:
+  enabled: true
+  className: traefik
+  host: opencut.local
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: opencut-headers@kubernetescrd
+  tls: []
+  #  - secretName: opencut-tls
+  #    hosts:
+  #      - opencut.local
+
+# -- PostgreSQL
+postgres:
+  # Set to false to use an external PostgreSQL instance
+  enabled: true
+  image:
+    repository: postgres
+    tag: "17"
+  storage:
+    size: 10Gi
+    storageClassName: ""
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  auth:
+    username: opencut
+    password: opencut
+    database: opencut
+
+# -- External PostgreSQL (used when postgres.enabled is false)
+externalPostgres:
+  host: ""
+  port: 5432
+  username: ""
+  password: ""
+  database: ""
+  # Or provide a full connection string (takes precedence over individual fields)
+  databaseUrl: ""
+
+# -- Redis
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: 7-alpine
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# -- Serverless Redis HTTP
+serverlessRedisHttp:
+  enabled: true
+  image:
+    repository: hiett/serverless-redis-http
+    tag: latest
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  auth:
+    token: "example_token"

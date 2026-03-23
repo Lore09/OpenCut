@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverless-redis-http
+  namespace: opencut
+  labels:
+    app: serverless-redis-http
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serverless-redis-http
+  template:
+    metadata:
+      labels:
+        app: serverless-redis-http
+    spec:
+      containers:
+        - name: serverless-redis-http
+          image: hiett/serverless-redis-http:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: SRH_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: opencut-config
+                  key: SRH_MODE
+            - name: SRH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencut-secrets
+                  key: SRH_TOKEN
+            - name: SRH_CONNECTION_STRING
+              valueFrom:
+                configMapKeyRef:
+                  name: opencut-config
+                  key: SRH_CONNECTION_STRING
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
