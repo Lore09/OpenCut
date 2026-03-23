@@ -73,6 +73,8 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            MARBLE_WORKSPACE_KEY=${{ secrets.MARBLE_WORKSPACE_KEY }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
 
